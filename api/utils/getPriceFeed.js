@@ -9,15 +9,7 @@ module.exports = async (min, max) => {
       url: siteUrl,
     });
 
-    const coinArr = [];
-
-    await data.data.cryptocurrencies.map((elm) => {
-      elm.logo = `https://s2.coinmarketcap.com/static/img/coins/64x64/${elm.id}.png`;
-
-      coinArr.push(elm);
-    });
-
-    return coinArr;
+    return data.data.cryptoCurrencyList;
   } catch (err) {
     return err;
   }
