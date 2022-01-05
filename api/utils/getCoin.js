@@ -13,6 +13,8 @@ module.exports = async (coinSlug) => {
       (coin) => coin.slug === coinSlug
     );
 
+    coin[0].logo = `https://s2.coinmarketcap.com/static/img/coins/64x64/${coin[0].id}.png`;
+
     return coin[0];
   } catch (err) {
     return err;
