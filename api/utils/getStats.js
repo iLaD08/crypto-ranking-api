@@ -1,40 +1,28 @@
 const axios = require("axios");
-const cheerio = require("cheerio");
 
 module.exports = async () => {
   try {
-    const siteUrl = "https://cryptoslate.com/coins/";
+    const siteUrl = `https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?start=1&limit=500&sortBy=market_cap&sortType=desc&convert=USD&cryptoType=all&tagType=all&audited=false&aux=ath,atl,high24h,low24h,num_market_pairs,cmc_rank,date_added,max_supply,circulating_supply,total_supply,volume_7d,volume_30d,self_reported_circulating_supply,self_reported_market_cap`;
 
     const { data } = await axios({
       method: "GET",
       url: siteUrl,
     });
 
-    const $ = cheerio.load(data);
-    const elemSelector = "#pagetitle > div > div > div > span.value";
+    let statsData = {
+      totalCoins: data.data.totalCount,
+      marketCap: 0,
+      volume: 0,
+    };
 
-    const keys = [
-      "marketCap",
-      "volume",
-      "dominance",
-      "totalCryptos",
-      "totalTokens",
-      "totalPowCoins",
-      "totalPosCoins",
-    ];
+    data.data.cryptoCurrencyList.map(async (item) => {
+      let { marketCap, volume } = statsData;
 
-    let statsArr = [];
-
-    let keyIdx = 0;
-    let stateObj = {};
-    $(elemSelector).each((parentIdx, parentData) => {
-      stateObj[keys[keyIdx]] = $(parentData).text();
-
-      keyIdx++;
+      statsData.marketCap = marketCap + parseFloat(item.quotes[0].marketCap);
+      statsData.volume = volume + parseFloat(item.quotes[0].volume24h);
     });
-    statsArr.push(stateObj);
 
-    return statsArr[0];
+    return statsData;
   } catch (err) {
     return err;
   }
